@@ -62,15 +62,15 @@
             // 
             // desc_type
             // 
-            this.desc_type.AutoSize = true;
             this.desc_type.BackColor = System.Drawing.SystemColors.ButtonHighlight;
             this.desc_type.Font = new System.Drawing.Font("微软雅黑", 10.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.desc_type.ForeColor = System.Drawing.Color.OrangeRed;
             this.desc_type.Location = new System.Drawing.Point(1, 14);
             this.desc_type.Name = "desc_type";
-            this.desc_type.Size = new System.Drawing.Size(23, 19);
+            this.desc_type.Size = new System.Drawing.Size(23, 20);
             this.desc_type.TabIndex = 14;
             this.desc_type.Text = "定";
+            this.desc_type.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // time
             // 

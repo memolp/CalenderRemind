@@ -73,7 +73,7 @@
             this.mainPanel.ForeColor = System.Drawing.SystemColors.ControlLight;
             this.mainPanel.Location = new System.Drawing.Point(0, 0);
             this.mainPanel.Name = "mainPanel";
-            this.mainPanel.Size = new System.Drawing.Size(463, 503);
+            this.mainPanel.Size = new System.Drawing.Size(463, 501);
             this.mainPanel.TabIndex = 2;
             // 
             // closeApp
@@ -93,7 +93,7 @@
             this.gridView.Font = new System.Drawing.Font("微软雅黑", 7.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.gridView.Location = new System.Drawing.Point(24, 110);
             this.gridView.Name = "gridView";
-            this.gridView.Size = new System.Drawing.Size(420, 385);
+            this.gridView.Size = new System.Drawing.Size(420, 384);
             this.gridView.TabIndex = 2;
             // 
             // currentMonth
@@ -120,7 +120,7 @@
             this.panel1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.panel1.Location = new System.Drawing.Point(460, 0);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(340, 503);
+            this.panel1.Size = new System.Drawing.Size(340, 501);
             this.panel1.TabIndex = 6;
             // 
             // addNoteToDay
@@ -133,7 +133,7 @@
             this.addNoteToDay.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.addNoteToDay.TabIndex = 6;
             this.addNoteToDay.TabStop = false;
-            this.addNoteToDay.Click += new System.EventHandler(this.addNoteToDay_Click_1);
+            this.addNoteToDay.Click += new System.EventHandler(this.addNoteToDay_Click);
             // 
             // eventsScrollingView
             // 
@@ -141,7 +141,7 @@
             this.eventsScrollingView.AutoScroll = true;
             this.eventsScrollingView.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.eventsScrollingView.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
-            this.eventsScrollingView.Location = new System.Drawing.Point(0, 115);
+            this.eventsScrollingView.Location = new System.Drawing.Point(0, 113);
             this.eventsScrollingView.Name = "eventsScrollingView";
             this.eventsScrollingView.Size = new System.Drawing.Size(340, 388);
             this.eventsScrollingView.TabIndex = 5;
@@ -211,7 +211,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
-            this.ClientSize = new System.Drawing.Size(800, 503);
+            this.ClientSize = new System.Drawing.Size(800, 501);
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.mainPanel);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;

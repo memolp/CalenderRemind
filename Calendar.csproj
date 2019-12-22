@@ -132,6 +132,7 @@
     <Compile Include="TextBoxInput.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Utils.cs" />
     <Compile Include="Win32.cs" />
     <EmbeddedResource Include="CalndarGridItem.resx">
       <DependentUpon>CalndarGridItem.cs</DependentUpon>

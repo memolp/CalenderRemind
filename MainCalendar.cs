@@ -21,30 +21,24 @@ namespace Calendar
 {
     public partial class MainCalendar : Form
     {
-
+        // 消息ID
         public const int WM_NCLBUTTONDOWN = 0xA1;
         public const int HT_CAPTION = 0x2;
-
-        [System.Runtime.InteropServices.DllImportAttribute("user32.dll")]
-        public static extern int SendMessage(IntPtr hWnd, int Msg, int wParam, int lParam);
-        [System.Runtime.InteropServices.DllImportAttribute("user32.dll")]
-        public static extern bool ReleaseCapture();
-
         public static string[] g_weeklabels = { "周日", "周一", "周二", "周三", "周四", "周五", "周六" };
-        int currentMonthCounter = 0;
-
-        DateTime TODAY;
-
-        CalndarGridItem selectedGridItem;
-
-        Label previouslySelected;
-
-        public static String eventFileName =  ".\\events.bin";
-
+        public static String eventFileName = ".\\events.bin";
+        // 当前的月份偏移
+        private int currentMonthCounter = 0;
+        // 今天日期
+        private DateTime TODAY;
+        // 当前选中的日期item
+        private CalndarGridItem selectedGridItem = null;
+        //记录格子列表
+        private List<CalndarGridItem> mCalenderItemList = new List<CalndarGridItem>();
+        // 定时器 保存数据和定时任务检查
         private Timer mTimer = new Timer();
-
+        // 任务提醒对话框
         private EventRemaind mEventMessage = null;
-
+        // 任务数据对象
         private EventDataDict mEventData = EventDataDict.GetInstance();
 
         public MainCalendar(Boolean desktop_)
@@ -61,41 +55,28 @@ namespace Calendar
 
         private void initView()
         {
-
+            //创建日期网格
+            createCalenderGrid();
+            // 加载本地日期数据
             mEventData.LoadEventData(eventFileName);
-
+            // 界面拖动消息
             mainPanel.MouseDown += dragger_MouseDown;
             closeApp.Click += stopApp;
 
             TODAY = DateTime.Today;
-            selectedGridItem = new CalndarGridItem();
-            previouslySelected = selectedGridItem.getTextView();
-
-            selectedGridItem.setText(TODAY.Day + "");
-            selectedGridItem.setDateTime(TODAY);
-
-
+            // 切月份的按钮
             nextMonthBtn.RotateLeft();
             prevMonthBtn.RotateRight();
-
-
             prevMonthBtn.addOnButtonClickHandler(new EventHandler(prevMonthBtn_onClick));
             nextMonthBtn.addOnButtonClickHandler(new EventHandler(nextMonthBtn_onClick));
 
-
-            createGrid(0);
-
-            String currenDayOfMonthString = (int)DateTime.Today.Day + "";
-            currentDayOfMonth.Text = (currenDayOfMonthString.Length < 2 ? "0" + currenDayOfMonthString : currenDayOfMonthString);
-            currentDayOfWeek.Text = TODAY.DayOfWeek + "";
-
+            // 刷新格子为当前月
+            refreshCalenderGrid(0);
+            // 设置任务列表垂直滚动
             this.eventsScrollingView.AutoScroll = false;
             this.eventsScrollingView.FlowDirection = FlowDirection.TopDown;
             this.eventsScrollingView.HorizontalScroll.Maximum = 0;
             this.eventsScrollingView.AutoScroll = true;
-
-            startEventsList();
-
         }
 
         private void create_timer()
@@ -108,7 +89,7 @@ namespace Calendar
         private void onTimerTick(object sender, EventArgs e)
         {
             DateTime today = DateTime.Now;
-            String key = today.Year + "年" + today.Month + "月" + today.Day + "日";
+            String key = Utils.GetDateString(today);
             int hash_key = key.GetHashCode();
             List<Event> events = mEventData.DateOfEvents(hash_key);
             if (events != null)
@@ -155,276 +136,200 @@ namespace Calendar
         {
             mEventMessage.FormClosed -= onEventCloseHandler;
             mEventMessage = null;
-            startEventsList();
+            refreshEventList();
         }
-
-        private void createGrid(int addMonth)
+        /**
+         * 创建一个7x7的日期网格
+         */ 
+        private void createCalenderGrid()
         {
-       
-            gridView.Controls.Clear();
-
-            // 创建星期item
-            for (int i = 0; i < 7; i++)
+            //创建一个7×7的网格
+            for(int i = 0; i < 49; i++)
             {
                 CalndarGridItem item = new CalndarGridItem();
-                item.setText(g_weeklabels[i]);
-                item.setTextColor(Color.FromArgb(50, 63, 86));
+                // 第一行为星期页签
+                if (i < 7)
+                {
+                    item.setWeekDay(g_weeklabels[i]);
+                    item.setTextColor(Color.FromArgb(50, 63, 86));
+                }
+                else
+                {
+                    // 注册点击事件
+                    item.setOnGridItemClickListener(new CalndarGridItemClickHandler(onGridItemClickListener));
+                }
                 gridView.Controls.Add(item);
+                mCalenderItemList.Add(item);
             }
-
-            DateTime temp;
-
+        }
+        /**
+         * 创建日期格子，包括星期页签
+         */
+        private void refreshCalenderGrid(int offsetMonth)
+        {
+            // 重置当前月
+            currentMonthCounter = offsetMonth;
+            if(selectedGridItem != null)
+            {
+                selectedGridItem.ClearSelectedEffect();
+            }
+            // 计算当前选择的月 以及上一个月 下一个月
             DateTime today = DateTime.Today;
-
-            if (addMonth != 0)
-                today = today.AddMonths(addMonth);
-
+            // 如果不是本月
+            if (offsetMonth != 0)
+                today = today.AddMonths(offsetMonth);
+            // 下个月
             DateTime nextMonth = today.AddMonths(1);
-
+            // 上个月
             DateTime prevMonth = today.AddMonths(-1);
-
-
-            temp = new DateTime(today.Year, today.Month, 1);
-
+            // 本月的第一天
+            DateTime temp = new DateTime(today.Year, today.Month, 1);
 
             int dayOfWeek = (int)temp.DayOfWeek;
-
+            int list_index = 7;
+            // 显示上个月剩余的天数
             int dayOfPrevMonth = System.DateTime.DaysInMonth(prevMonth.Year, prevMonth.Month);
-
             for (int i = dayOfWeek - 1; i >= 0; i--)
             {
-                CalndarGridItem item = new CalndarGridItem();
-                item.setText((dayOfPrevMonth - i) + "");
+                CalndarGridItem item = mCalenderItemList[list_index++];
+                item.ResetItem();
+                //item.setDayText((dayOfPrevMonth - i) + "");
+                item.setDateTime(new DateTime(prevMonth.Year, prevMonth.Month, (dayOfPrevMonth - i)));
                 item.setTextColor(Color.FromArgb(50, 63, 86));
-                gridView.Controls.Add(item);
             }
-
-
+            // 显示本月的天数
             int daysOfCurrentMonth = System.DateTime.DaysInMonth(today.Year, today.Month);
-
-
-            for (int i = 1; i <= daysOfCurrentMonth; i++)
+            for (int i = 1; i <= daysOfCurrentMonth && list_index < mCalenderItemList.Count; i++)
             {
-                CalndarGridItem item = new CalndarGridItem();
-                item.setText(i + "");
-
-                if (addMonth == 0 && i == (int)DateTime.Today.Day)
+                string day = i.ToString();
+                // 创建日期格子
+                CalndarGridItem item = mCalenderItemList[list_index++];
+                item.ResetItem();
+                item.setDateTime(new DateTime(today.Year, today.Month, i));
+                item.setTextColor(Color.FromArgb(255, 255, 255));
+                // 今天
+                if (offsetMonth == 0 && i == DateTime.Today.Day)
+                {
                     item.makeToDay();
-
-                item.setDateTime(today);
-
-                item.getTextView().Cursor = Cursors.Hand;
-
-                item.setOnGridItemClickListener(new EventHandler(onGridItemClickListener));
-
-                //String key = i + " " + today.ToString("MMMM").Substring(0, 3) + " " + today.Year;
-                String key = today.Year + "年" + today.Month + "月" + i + "日";
-
+                    //首次启动没有选择item，就选中今天
+                    if(selectedGridItem == null)
+                        selectedGridItem = item;
+                }
+                    
+                String key = Utils.GetDateString(today, day);
                 if (mEventData.ContainsKey(key.GetHashCode()))
                 {
-                    if (addMonth <= 0 && i < TODAY.Day)
+                    if (offsetMonth <= 0 && i < TODAY.Day)
                         item.hadNote();
                     else
                         item.hasNote();
                 }
-
-                gridView.Controls.Add(item);
             }
-
+            // 显示下一个月的前几天
             int daysOfNextMonth = dayOfWeek - 1 + daysOfCurrentMonth;
-
-            for (int i = 1; i < 35 - daysOfNextMonth; i++)
+            for (int i = 1; i < 42 - daysOfNextMonth; i++)
             {
-                CalndarGridItem item = new CalndarGridItem();
-                item.setText(i + "");
+                CalndarGridItem item = mCalenderItemList[list_index++];
+                item.ResetItem();
+                item.setDateTime(new DateTime(nextMonth.Year, nextMonth.Month, i));
                 item.setTextColor(Color.FromArgb(50, 63, 86));
-                gridView.Controls.Add(item);
             }
-
+            // 设置界面年月
             currentMonth.Text = today.ToString("MMMM");
             currentYear.Text = today.Year + "";
-
+            // 设置选择
+            if(!selectedGridItem.daysAreEqual(TODAY))
+            {
+                selectedGridItem.SetSelectedEffect();
+            }
+            refreshEventList();
         }
-
+        /**
+         * 上个月
+         */ 
         private void prevMonthBtn_onClick(object sender, EventArgs e)
         {
             currentMonthCounter--;
-            createGrid(currentMonthCounter);
+            refreshCalenderGrid(currentMonthCounter);
         }
-
+        /**
+         * 下个月
+         */ 
         private void nextMonthBtn_onClick(object sender, EventArgs e)
         {
             currentMonthCounter++;
-            createGrid(currentMonthCounter);
+            refreshCalenderGrid(currentMonthCounter);
         }
-
-        private void prevMonthBtn_Load(object sender, EventArgs e)
+        /**
+         * 点击添加任务按钮
+         */
+        private void addNoteToDay_Click(object sender, EventArgs e)
         {
-
-        }
-
-        private Bitmap changeColor(Bitmap sourceBitmap, float blueTint, float greenTint, float redTint)
-        {
-            BitmapData sourceData = sourceBitmap.LockBits(new Rectangle(0, 0,
-                                    sourceBitmap.Width, sourceBitmap.Height),
-                                    ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
-
-
-            byte[] pixelBuffer = new byte[sourceData.Stride * sourceData.Height];
-
-
-            Marshal.Copy(sourceData.Scan0, pixelBuffer, 0, pixelBuffer.Length);
-
-
-            sourceBitmap.UnlockBits(sourceData);
-
-
-            float blue = 0;
-            float green = 0;
-            float red = 0;
-
-
-            for (int k = 0; k + 4 < pixelBuffer.Length; k += 4)
-            {
-                blue = pixelBuffer[k] + (255 - pixelBuffer[k]) * blueTint;
-                green = pixelBuffer[k + 1] + (255 - pixelBuffer[k + 1]) * greenTint;
-                red = pixelBuffer[k + 2] + (255 - pixelBuffer[k + 2]) * redTint;
-
-
-                if (blue > 255)
-                { blue = 255; }
-
-
-                if (green > 255)
-                { green = 255; }
-
-
-                if (red > 255)
-                { red = 255; }
-
-
-                pixelBuffer[k] = (byte)blue;
-                pixelBuffer[k + 1] = (byte)green;
-                pixelBuffer[k + 2] = (byte)red;
-
-
-            }
-
-
-            Bitmap resultBitmap = new Bitmap(sourceBitmap.Width, sourceBitmap.Height);
-
-
-            BitmapData resultData = resultBitmap.LockBits(new Rectangle(0, 0,
-                                    resultBitmap.Width, resultBitmap.Height),
-                                    ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
-
-
-            Marshal.Copy(pixelBuffer, 0, resultData.Scan0, pixelBuffer.Length);
-            resultBitmap.UnlockBits(resultData);
-
-
-            return resultBitmap;
-        }
-
-        private void initEventList()
-        {
-
-
-
-        }
-
-        private void addNoteToDay_Click_1(object sender, EventArgs e)
-        {
-
+            //任务事件对话框
             EventUI dialog = new EventUI();
-
-            DateTime dt = DateTime.Now;
-
-            dt = dt.AddMonths(currentMonthCounter);
-            //String datetime = previouslySelected.Text + " " + dt.ToString("MMMM").Substring(0, 3) + " " + dt.Year;
-            String datetime = dt.Year + "年" + dt.Month + "月" + previouslySelected.Text + "日";
-            dialog.setInitUIView(datetime , string.Format("{0:00}",dt.Hour) , string.Format("{0:00}", dt.Minute));
-
+            // 获取时间
+            string datetime = Utils.GetDateString(selectedGridItem.getDateTime());
+            // 初始化对话框    
+            dialog.setInitUIView(datetime);
+            // 显示对话框
             DialogResult dr = dialog.ShowDialog();
-
             if (dr == DialogResult.OK)
             {
-                //createGrid(currentMonthCounter);
-                startEventsList();
-
+                refreshCalenderGrid(currentMonthCounter);
             }
-
-
-
         }
 
-        private void onGridItemClickListener(object sender, EventArgs e)
+        private void onGridItemClickListener(CalndarGridItem sender)
         {
-            previouslySelected.BorderStyle = BorderStyle.None;
-
-            if (int.Parse(((Label)sender).Text.ToString()) != TODAY.Day)
-                ((Label)sender).BorderStyle = BorderStyle.Fixed3D;
-
-            previouslySelected = ((Label)sender);
-
-            startEventsList();
-
+            // 更新选中效果
+            selectedGridItem.ClearSelectedEffect();
+            if (!sender.daysAreEqual(TODAY))
+                sender.SetSelectedEffect();
+            selectedGridItem = sender;
+            // 更新任务事件列表
+            refreshEventList();
         }
 
         private void onEventItemClickListener(Event obj)
         {
             EventUI dialog = new EventUI();
-
-            DateTime dt = DateTime.Now;
-            dt = dt.AddMonths(currentMonthCounter);
-            String datetime = dt.Year + "年" + dt.Month + "月" + previouslySelected.Text + "日";
-
+            String datetime = Utils.GetDateString(selectedGridItem.getDateTime());
             dialog.setInitUIView(obj, datetime);
             DialogResult dr = dialog.ShowDialog();
-
             if (dr == DialogResult.OK)
             {
-                //createGrid(currentMonthCounter);
-                startEventsList();
+                refreshCalenderGrid(currentMonthCounter);
             }
         }
-
         /**
          *  初始化事件列表
          */
         private void initEventsList(List<Event> events)
         {
-
+            if (events == null) return;
             for (int i = 0; i < events.Count; i++)
             {
                 EventItem item = new EventItem(events[i]);
                 item.setOnEventItemClickListener(new EventItemClickHandler(onEventItemClickListener));
                 eventsScrollingView.Controls.Add(item);
             }
-
         }
-
-        private void startEventsList()
+        /**
+         * 刷新事件列表
+         */ 
+        private void refreshEventList()
         {
-            DateTime temp = TODAY;
-            temp = temp.AddMonths(currentMonthCounter);
-            //String key_temp = previouslySelected.Text + " " + temp.ToString("MMMM").Substring(0, 3) + " " + temp.Year;
-            String key_temp = temp.Year + "年" + temp.Month + "月" + previouslySelected.Text + "日";
-            currentDayOfMonth.Text = previouslySelected.Text;
-            currentDayOfWeek.Text = g_weeklabels[(int)new DateTime(temp.Year, temp.Month,int.Parse(previouslySelected.Text)).DayOfWeek];
-            eventsScrollingView.Controls.Clear();
+            DateTime gridDate = selectedGridItem.getDateTime();
+            string datetime = Utils.GetDateString(gridDate);
+            currentDayOfMonth.Text = gridDate.Day.ToString();
+            currentDayOfWeek.Text = g_weeklabels[(int)gridDate.DayOfWeek];
 
-            List<Event> events = mEventData.DateOfEvents(key_temp.GetHashCode());
-            if (events != null)
-                initEventsList(events);
-            else
-                initEventsList(new List<Event>());
+            eventsScrollingView.Controls.Clear();
+            List<Event> events = mEventData.DateOfEvents(datetime.GetHashCode());
+            initEventsList(events);
 
             List<Event> remaindEvents = mEventData.DateOfEvents(0);
-            if(remaindEvents != null)
-            {
-                initEventsList(remaindEvents);
-            }
+            initEventsList(remaindEvents);
 
         }
 
@@ -432,8 +337,8 @@ namespace Calendar
         {
             if (e.Button == MouseButtons.Left)
             {
-                ReleaseCapture();
-                SendMessage(Handle, WM_NCLBUTTONDOWN, HT_CAPTION, 0);
+                Win32.ReleaseCapture();
+                Win32.SendMessage(Handle, WM_NCLBUTTONDOWN, HT_CAPTION, 0);
             }
         }
 
