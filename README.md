@@ -1,4 +1,4 @@
-# CalenderRemaind
+# CalenderRemind
 一个C#的日历提醒软件，基于winform开发
 
 ### 一、功能介绍
