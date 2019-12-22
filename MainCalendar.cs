@@ -37,7 +37,7 @@ namespace Calendar
         // 定时器 保存数据和定时任务检查
         private Timer mTimer = new Timer();
         // 任务提醒对话框
-        private EventRemaind mEventMessage = null;
+        private EventRemind mEventMessage = null;
         // 任务数据对象
         private EventDataDict mEventData = EventDataDict.GetInstance();
 
@@ -102,7 +102,7 @@ namespace Calendar
                     {
                         if(mEventMessage == null)
                         {
-                            mEventMessage = new EventRemaind();
+                            mEventMessage = new EventRemind();
                             mEventMessage.FormClosed += onEventCloseHandler;
                             mEventMessage.Show();
                         }

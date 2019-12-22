@@ -11,10 +11,10 @@ using System.Windows.Forms;
 
 namespace Calendar
 {
-    public partial class EventRemaind : Form
+    public partial class EventRemind : Form
     {
         private Event mEventData = null;
-        public EventRemaind()
+        public EventRemind()
         {
             InitializeComponent();
         }

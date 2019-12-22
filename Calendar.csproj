@@ -94,11 +94,11 @@
     <Compile Include="EventItem.Designer.cs">
       <DependentUpon>EventItem.cs</DependentUpon>
     </Compile>
-    <Compile Include="EventRemaind.cs">
+    <Compile Include="EventRemind.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="EventRemaind.Designer.cs">
-      <DependentUpon>EventRemaind.cs</DependentUpon>
+    <Compile Include="EventRemind.Designer.cs">
+      <DependentUpon>EventRemind.cs</DependentUpon>
     </Compile>
     <Compile Include="MainCalendar.cs">
       <SubType>Form</SubType>
@@ -140,8 +140,8 @@
     <EmbeddedResource Include="EventItem.resx">
       <DependentUpon>EventItem.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="EventRemaind.resx">
-      <DependentUpon>EventRemaind.cs</DependentUpon>
+    <EmbeddedResource Include="EventRemind.resx">
+      <DependentUpon>EventRemind.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="MainCalendar.resx">
       <DependentUpon>MainCalendar.cs</DependentUpon>

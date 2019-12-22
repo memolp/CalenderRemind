@@ -1,6 +1,6 @@
 ﻿namespace Calendar
 {
-    partial class EventRemaind
+    partial class EventRemind
     {
         /// <summary>
         /// Required designer variable.
@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(EventRemaind));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(EventRemind));
             this.eventDate = new System.Windows.Forms.Label();
             this.eventTitle = new Calendar.TextBoxInput();
             this.eventTime = new System.Windows.Forms.Label();
