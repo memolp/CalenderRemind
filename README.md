@@ -17,4 +17,4 @@
 3. ` 如果有其他疑问，欢迎沟通 `
 
 ### 四、软件截图
-[!avatar](https://github.com/memolp/CalenderRemaind/blob/master/images/screencap.png)
+![软件截图](https://github.com/memolp/CalenderRemaind/blob/master/images/screencap.jpg)
