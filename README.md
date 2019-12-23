@@ -10,7 +10,7 @@
 
 ### 二、代码依赖
 `C# winform 框架开发的，整个工程来自github上的一位作者(稍后找到原作者地址后，会加上来)，经过了大幅度的修改，增加了上述的不同类型的任务，以及逻辑调整。`
-`原作者[github地址](https://github.com/tarlanahad/Calendar)`
+原作者[github地址](https://github.com/tarlanahad/Calendar)
 ### 三、其他说明
 1. ` Calendar.exe -desktop 启动可以让应用贴在桌面上 `
 2. ` 由于考虑到无网络使用，不附带天气，节日功能。`
