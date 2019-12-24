@@ -40,6 +40,8 @@ namespace Calendar
         private EventRemind mEventMessage = null;
         // 任务数据对象
         private EventDataDict mEventData = EventDataDict.GetInstance();
+        // 上次记录存储的时间
+        private DateTime mLastRecordSaveTime = DateTime.Now;
 
         public MainCalendar(Boolean desktop_)
         {
@@ -88,8 +90,8 @@ namespace Calendar
 
         private void onTimerTick(object sender, EventArgs e)
         {
-            DateTime today = DateTime.Now;
-            String key = Utils.GetDateString(today);
+            DateTime current_datetime = DateTime.Now;
+            String key = Utils.GetDateString(current_datetime);
             int hash_key = key.GetHashCode();
             List<Event> events = mEventData.DateOfEvents(hash_key);
             if (events != null)
@@ -98,7 +100,7 @@ namespace Calendar
                 {
                     if (evt.Type != 1) continue;
                     if (evt.closed == 1) continue;
-                    if(this.inTimer(evt.Time , today))
+                    if(this.inTimer(evt.Time , current_datetime))
                     {
                         if(mEventMessage == null)
                         {
@@ -106,9 +108,16 @@ namespace Calendar
                             mEventMessage.FormClosed += onEventCloseHandler;
                             mEventMessage.Show();
                         }
-                        mEventMessage.initView(evt, string.Format("{0:00}:{1:00}:{2:00}", today.Hour, today.Minute, today.Second));
+                        mEventMessage.initView(evt, string.Format("{0:00}:{1:00}:{2:00}", current_datetime.Hour, current_datetime.Minute, current_datetime.Second));
                     }
                 }
+            }
+            //每隔10分钟存储数据一次
+            TimeSpan diff = current_datetime - mLastRecordSaveTime;
+            if(diff.Minutes > 10)
+            {
+                mLastRecordSaveTime = current_datetime;
+                mEventData.SaveEventData();
             }
         }
         private static string[] g_time_split = { ":" };
