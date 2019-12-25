@@ -50,7 +50,7 @@ namespace Calendar
                 minuteTxt.Text = hour_munite[1];
             }
             event_type.SelectedIndex = e.Type;
-            event_id.Text = "" + e.EventID;
+            event_id.Text = e.EventID;
             btn_remove.Show();
             btn_primary.Text = "保存";
         }
@@ -72,7 +72,7 @@ namespace Calendar
             else
             {
                 //如果是备忘任务，这个会显示到所有的日期列表的最后面 - 暂时这样显示
-                Event evt = EventDataDict.GetInstance().GetEventWithID(long.Parse(event_id.Text));
+                Event evt = EventDataDict.GetInstance().GetEventWithID(event_id.Text);
                 if(evt != null)
                 {
                     evt.Time = hourTxt.Text + ":" + minuteTxt.Text;
@@ -94,7 +94,7 @@ namespace Calendar
         {
             List<Event> eventslist = new List<Event>();
             //如果是备忘任务，这个会显示到所有的日期列表的最后面 - 暂时这样显示
-            EventDataDict.GetInstance().RemoveEventWithID(long.Parse(event_id.Text));
+            EventDataDict.GetInstance().RemoveEventWithID(event_id.Text);
         }
 
         private void close_Click(object sender, EventArgs e)

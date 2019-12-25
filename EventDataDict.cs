@@ -98,7 +98,7 @@ namespace Calendar
         /**
          * 根据事件的id获取event
          */
-        public Event GetEventWithID(long eventID)
+        public Event GetEventWithID(String eventID)
         {
             if (mEvents == null)
             {
@@ -202,7 +202,7 @@ namespace Calendar
         /**
          *  移除事件根据id
          */ 
-        public void RemoveEventWithID(long eventID)
+        public void RemoveEventWithID(String eventID)
         {
             if (mEvents == null)
             {

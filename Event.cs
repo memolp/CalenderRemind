@@ -21,14 +21,14 @@ namespace Calendar
         public String Date;
         // 类型 0普通 1定时 2备忘
         public int Type = 0;
-        // 时间id
-        public long EventID = 0;
+        // 事件id
+        public String EventID;
         // 关闭
         public int closed = 0;
 
         public Event()
         {
-            EventID = this.GetHashCode();
+            EventID = Guid.NewGuid().ToString();
         }
 
         public Event(String Title, String Time, String Date, int _type)
@@ -37,7 +37,7 @@ namespace Calendar
             this.Time = Time;
             this.Date = Date;
             this.Type = _type;
-            this.EventID = this.GetHashCode();
+            this.EventID = Guid.NewGuid().ToString();
         }
 
         public String getTitle()
